@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <link rel="stylesheet" href="css/styles1.css">
+    <link rel="stylesheet" href="style_select.css">
+    <script src="js/script1.js" defer></script>
+</head>
+
+<body>
+    <script>
+        var characters = {};
+
+        function saveCharacter(formId, role) {
+            const form = document.getElementById(formId);
+            const name = form.querySelector("[name='name']").value;
+            const health = parseInt(form.querySelector("[name='health']").value);
+            const attack = parseInt(form.querySelector("[name='attack']").value);
+            const defense = parseInt(form.querySelector("[name='defense']").value);
+            const magic = parseInt(form.querySelector("[name='magic']").value);
+            const skill = form.querySelector("[name='skill']").value;
+            let isChecked = document.getElementById("playerOrEnemy").checked;
+            characters[name] = { health, attack, defense, magic, skill, name };
+            alert(role + " сохранен: " + name);
+            if (isChecked) {
+                chooseCharacter_player(name);
+            } else {
+
+                chooseCharacter_enemy(name);
+            }
+
+        }
+
+        function chooseCharacter(role) {
+            const name = document.getElementById(role + "_select").value;
+            if (characters[name]) {
+                alert(role + " выбран: " + name);
+            } else {
+                alert("Выберите доступного персонажа!");
+            }
+        }
+    </script>
+    </head>
+
+    <body>
+
+        <p>Помимо атаки и защиты, а также заклинаний, которые увеличивают атаку и защиту, в бою есть критические,
+            смертельные удары и комбо. <br>
+            Критический удар с определённой вероятность может нанести дополнительный урон. Разница между атакой бойца и
+            его противника умножается на случайное число от 0 до 1 - это и будет дополнительный урон(не может быть ниже
+            10).<br>
+            <!-- 15%противник 40% игрок -->
+            Смертельный удар с определённой вероятность может нанести дополнительный урон. Атака бойца умножается на
+            случайное число от 0 до 1 - это и будет дополнительный урон(не может быть ниже 10).<br>
+            <!-- 5% противник 10% игрок -->
+            Механизм комбо работает следующим образом: с каждый последующем ударом урон будет увеличиваться, то есть
+            второй удар нанесёт дополнительно 1 урона, второй 2 и так далее (до 10). Если боец использует заклинаний, то
+            комбо обнуляется.</p>
+
+        <div class="character-setup">
+            <h3>Настройка персонажа</h3>
+            <form id="playerForm">
+                <label>Выберите персонажа:
+                    <select id="playerCharacter">
+                        <option value="blue_samurai">Синий самурай</option>
+                        <option value="white_dragon">Белый дракон</option>
+                        <option value="cowboy">Ковбой</option>
+                        <option value="lucifer">Дьявол</option>
+                        <option value="ogre_mage">Огр-маг</option>
+                        <option value="ogre">Огр</option>
+                        <option value="pirate">Пират</option>
+                        <option value="pink_dragon">Розовый дракон</option>
+                        <option value="zombie">Зомби</option>
+                        <option value="haos">Генерал Хаоса</option>
+                    </select>
+                </label>
+                <label>Здоровье: <input type="number" id="playerHealth" value="100"></label>
+                <label>Атака: <input type="number" id="playerAttack" value="15"></label>
+                <label>Защита: <input type="number" id="playerDefense" value="10"></label>
+                <label>Магия: <input type="number" id="playerMagic" value="40"></label>
+                <button type="button" onclick="savePlayerSettings()">Сохранить</button>
+                <!-- <br>Это игрок?<input type="checkbox" name="player_or_enemy" id=""> -->
+            </form>
+        </div>
+
+        <div class="character-setup">
+            <h3>Настройка противника</h3>
+            <form id="enemyForm">
+                <label>Выберите противника:
+                    <select id="enemyCharacter">
+                        <option value="blue_samurai">Синий самурай</option>
+                        <option value="white_dragon">Белый дракон</option>
+                        <option value="cowboy">Ковбой</option>
+                        <option value="lucifer">Дьявол</option>
+                        <option value="ogre_mage">Огр-маг</option>
+                        <option value="ogre">Огр</option>
+                        <option value="pirate">Пират</option>
+                        <option value="pink_dragon">Розовый дракон</option>
+                        <option value="zombie">Зомби</option>
+                        <option value="haos">Генерал Хаоса</option>
+                    </select>
+                </label>
+                <label>Здоровье: <input type="number" id="enemyHealth" value="100"></label>
+                <label>Атака: <input type="number" id="enemyAttack" value="15"></label>
+                <label>Защита: <input type="number" id="enemyDefense" value="10"></label>
+                <label>Магия: <input type="number" id="enemyMagic" value="40"></label>
+                <button type="button" onclick="saveEnemySettings()">Сохранить</button>
+            </form>
+        </div>
+
+        <button class="PvEmode" onclick="PvEm()">PvE mode</button>
+        <div class="vs-zone">
+            <div class="player_select">
+                <button onclick="chooseCharacter_player('blue_samurai')" id="p1">Синий самурай</button>
+                <button onclick="chooseCharacter_player('white_dragon')">Белый дракон</button>
+                <button onclick="chooseCharacter_player('cowboy')">Ковбой</button>
+                <button onclick="chooseCharacter_player('lucifer')">Дьявол</button>
+                <button onclick="chooseCharacter_player('ogre_mage')">Огр-маг</button>
+                <button onclick="chooseCharacter_player('ogre')">Огр</button>
+                <button onclick="chooseCharacter_player('pirate')">Пират</button>
+                <button onclick="chooseCharacter_player('pink_dragon')">Розовый дракон</button>
+                <button onclick="chooseCharacter_player('zombie')">Зомби</button>
+                <button onclick="chooseCharacter_player('haos')">Генерал Хаоса</button>
+                <div id="player_watcher"></div>
+            </div>
+            <div class="enemy_select">
+                <button onclick="chooseCharacter_enemy('blue_samurai')">Синий самурай</button>
+                <button onclick="chooseCharacter_enemy('white_dragon')">Белый дракон</button>
+                <button onclick="chooseCharacter_enemy('cowboy')">Ковбой</button>
+                <button onclick="chooseCharacter_enemy('lucifer')">Дьявол</button>
+                <button onclick="chooseCharacter_enemy('ogre_mage')">Огр-маг</button>
+                <button onclick="chooseCharacter_enemy('ogre')">Огр</button>
+                <button onclick="chooseCharacter_enemy('pirate')">Пират</button>
+                <button onclick="chooseCharacter_enemy('pink_dragon')">Розовый дракон</button>
+                <button onclick="chooseCharacter_enemy('zombie')">Зомби</button>
+                <button onclick="chooseCharacter_enemy('haos')">Генерал Хаоса</button>
+            </div>
+        </div>
+
+        <div class="battle-zone">
+            <div class="port">
+                <ul id="menu-select">
+                    <li><button class="activebutton" onclick="allattackclick('attack')">Атака (R)</button></li>
+                    <li><button>Книги заклинаний</button></li>
+                    <li><select id="select" class="activebutton" onchange="allattackclick(this.value)">
+                            <option>Лечебная магия</option>
+                            <option title="10 магии +10 лечение" value="heal">Лечение (E)</option>
+                            <option title="25 магии +10 лечение без затраты хода" value="fast_heal">Быстрое лечение (D)
+                            </option>
+                            <option title="75 магии +3 здоровья каждый ход (тратит 5 магии каждый ход)" value="regen">
+                                Регенерация (B)</option>
+                            <option title="80 магии +50 лечение" value="gods_gift">Длань богов (C)</option>
+                        </select></li>
+                    <li><select id="select" class="activebutton" onchange="allattackclick(this.value)">
+                            <option>Атакующая магия</option>
+                            <option title="10 магии 3 урона без затраты хода" value="sparks">Искры (T)</option>
+                            <option title="25 магии 10 урона без затраты хода" value="magic_fist">Волшебный кулак (U)
+                            </option>
+                            <option title="125 магии 50 урона без затраты хода" value="hand_of_death">Рука Смерти (J)
+                            </option>
+                            <option title="25 магии 10 урона +10 лечение" value="vampire_touch">Вампирское прикосновение
+                                (,)
+                            </option>
+                            <option title="50 магии 15 урона +15 лечение" value="vampire_bite">Вампирский укус (.)
+                            </option>
+                            <option title="75 магии отнимает 30% здоровья, и 120% от отнятого стреляет в врага"
+                                value="magic_boom">Магический взрыв (LShift)</option>
+                            <option title="95 магии 10 урона противнику каждый ход" value="storm">Гроза</option>
+                            <option title="5 магии 5 урона" value="arrow">Волшебная стрела (Enter)</option>
+                            <option title="10 магии 10 урона" value="light">Магическая молния (F)</option>
+                            <option title="25 магии 20 урона" value="fireball">Огненный шар</option>
+                            <option title="40 магии 35 урона" value="inferno">Инферно</option>
+                            <option title="60 магии 55 урона" value="meteor">Метеоритный дождь</option>
+                            <option title="150 магии 120 урона" value="armagedon">Армагедон</option>
+                            <option title="200 магии 120 урона без затраты хода" value="disintegration">Дезинтеграция
+                                (M)
+                            </option>
+                        </select></li>
+
+                    <li><select id="select" class="activebutton" onchange="allattackclick(this.value)">
+                            <option>Усиливающая магия</option>
+                            <option title="5 магии +2 защита" value="shield">Щит (A)</option>
+                            <option title="30 магии +5 защита" value="block">Каменная кожа (Q)</option>
+                            <option title="80 магии +10 защита" value="defender">Защитник (Z)</option>
+                            <option title="15 магии +2 атака" value="sword">Меч (S)</option>
+                            <option title="40 магии +5 атака" value="fire">Жажда крови (W)</option>
+                            <option title="80 магии +10 атака" value="executioner">Палач (X)</option>
+                            <option title="110 магии +15 атака" value="madness">Кровавое безумие</option>
+                            <option title="30 магии +2 атака +2 защита, сбивает комбо противника" value="equipment">
+                                Снаряжение (Y)</option>
+                            <option title="60 магии +5 атака +5 защита, сбивает комбо противника" value="blessing">
+                                Благословение (H)</option>
+                            <option title="120 магии +15 атака +15 защита, сбивает комбо противника" value="prayer">
+                                Молитва
+                                (N)</option>
+                            <option title="120 магии каждый ход +1 защита" value="heavenly-shield">Небесный щит (I)
+                            </option>
+                            <option title="230 магии каждый ход +1 защита" value="heavenly-armor">Небесная броня (K)
+                            </option>
+                            <option title="40 магии каждая атака восстанавливает здоровья от отнятого"
+                                value="vampire_style">Вампиризм (LCtrl)</option>
+
+                        </select></li>
+                    <li><select id="select" class="activebutton" onchange="allattackclick(this.value)">
+                            <option>Ослабляющая магия</option>
+                            <option title="20 магии враг теряет 1 здоровья каждый ход" value="poison">Яд (G)</option>
+                            <option title="55 магии враг теряет 2 здоровья каждый ход" value="fire-shield">Огненный щит
+                                (O)
+                            </option>
+                            <option title="80 магии отнимает у противника 60 магии" value="antimagic">Антимагия (L)
+                            </option>
+                            <option
+                                title="45 магии на один ход оппонент не может использовать заклинания (обладает накопительным эффектом)"
+                                value="silence">Безмолвие (P)</option>
+                            <option title="230 магии каждый ход -1 атаки противнику" value="plaque">Чума</option>
+                        </select></li>
+
+                    <li><select id="select" class="activebutton" onchange="allattackclick(this.value)">
+                            <option>Особая магия</option>
+                            <option title="50 магии +10 атака -5 защита" value="berserk">Берсерк (4)</option>
+                            <option title="должно быть 100 магии -80% здоровья, 40% уходят в магию" value="devastation">
+                                Разорение (5)</option>
+                            <option title="должно быть 100 магии -30 лечение +20 магии" value="sacrifice">
+                                Жертвоприношение
+                                (6)</option>
+                            <option title="120 магии защита обнуляется и у вас и у противника" value="slaughterhouse">
+                                Бойня
+                                (7)</option>
+                        </select></li>
+                    <!-- <li><select id="select" class="activebutton" id="arts" onchange="allattackclick(this.value)"> -->
+
+                    <!-- </select></li> -->
+                    <li><button class="activebutton" onclick="allattackclick('skill')">Навык</button></li>
+                    <li><button class="activebutton" onclick="spamAttack()">Авто-бой (V)</button></li>
+                </ul>
+
+                <div class="menu-button" style="display: none">
+                    <button title="10 магии +10 лечение" onclick="allattackclick('heal')">Лечение (E)</button>
+                    <button title="25 магии +10 лечение без затраты хода" onclick="allattackclick('fast_heal')">Быстрое
+                        лечение (D)</button>
+                    <button title="75 магии +3 здоровья каждый ход (тратит 5 магии каждый ход)"
+                        onclick="allattackclick('regen')">Регенерация (B)</button>
+                    <button title="80 магии +50 лечение" onclick="allattackclick('gods_gift')">Длань богов (C)</button>
+                    <button title="10 магии 3 урона без затраты хода" onclick="allattackclick('sparks')">Искры
+                        (T)</button>
+                    <button title="25 магии 10 урона без затраты хода" onclick="allattackclick('magic_fist')">Волшебный
+                        кулак (U)</button>
+                    <button title="125 магии 50 урона без затраты хода" onclick="allattackclick('hand_of_death')">Рука
+                        Смерти (J)</button>
+                    <button title="25 магии 10 урона +10 лечение" onclick="allattackclick('vampire_touch')">Вампирское
+                        прикосновение (,)</button>
+                    <button title="50 магии 15 урона +15 лечение" onclick="allattackclick('vampire_bite')">Вампирский
+                        укус
+                        (.)</button>
+                    <button title="75 магии отнимает 30% здоровья, и 120% от отнятого стреляет в врага"
+                        onclick="allattackclick('magic_boom')">Магический взрыв (LShift)</button>
+                    <button title="95 магии 10 урона противнику каждый ход"
+                        onclick="allattackclick('storm')">Гроза</button>
+                    <button title="5 магии 5 урона" onclick="allattackclick('arrow')">Волшебная стрела (Enter)</button>
+                    <button title="10 магии 10 урона" onclick="allattackclick('light')">Магическая молния (F)</button>
+                    <button title="25 магии 20 урона" onclick="allattackclick('fireball')">Огненный шар</button>
+                    <button title="40 магии 35 урона" onclick="allattackclick('inferno')">Инферно</button>
+                    <button title="60 магии 55 урона" onclick="allattackclick('meteor')">Метеоритный дождь</button>
+                    <button title="150 магии 120 урона" onclick="allattackclick('armagedon')">Армагедон</button>
+                    <button title="200 магии 120 урона без затраты хода"
+                        onclick="allattackclick('disintegration')">Дезинтеграция (M)</button>
+                    <div>
+                        <button title="5 магии +2 защита" onclick="allattackclick('shield')">Щит (A)</button>
+                        <button title="30 магии +5 защита" onclick="allattackclick('block')">Каменная кожа (Q)</button>
+                        <button title="80 магии +10 защита" onclick="allattackclick('defender')">Защитник (Z)</button>
+                        <button title="15 магии +2 атака" onclick="allattackclick('sword')">Меч (S)</button>
+                        <button title="40 магии +5 атака" onclick="allattackclick('fire')">Жажда крови (W)</button>
+                        <button title="80 магии +10 атака" onclick="allattackclick('executioner')">Палач (X)</button>
+                        <button title="110 магии +15 атака" onclick="allattackclick('madness')">Кровавое
+                            безумие</button>
+                        <button title="30 магии +2 атака +2 защита, сбивает комбо противника"
+                            onclick="allattackclick('equipment')">Снаряжение (Y)</button>
+                        <button title="60 магии +5 атака +5 защита, сбивает комбо противника"
+                            onclick="allattackclick('blessing')">Благословение (H)</button>
+                        <button title="120 магии +15 атака +15 защита, сбивает комбо противника"
+                            onclick="allattackclick('prayer')">Молитва (N)</button>
+                        <button title="120 магии каждый ход +1 защита"
+                            onclick="allattackclick('heavenly-shield')">Небесный
+                            щит (I)</button>
+                        <button title="230 магии каждый ход +1 защита"
+                            onclick="allattackclick('heavenly-armor')">Небесная
+                            броня (K)</button>
+                        <button title="40 магии каждая атака восстанавливает здоровья от отнятого"
+                            onclick="allattackclick('vampire_style')">Вампиризм (LCtrl)</button>
+                        <div>
+                            <button title="20 магии враг теряет 1 здоровья каждый ход"
+                                onclick="allattackclick('poison')">Яд
+                                (G)</button>
+                            <button title="55 магии враг теряет 2 здоровья каждый ход"
+                                onclick="allattackclick('fire-shield')">Огненный щит (O)</button>
+                            <button title="80 магии отнимает у противника 60 магии"
+                                onclick="allattackclick('antimagic')">Антимагия (L)</button>
+                            <button
+                                title="45 магии на один ход оппонент не может использовать заклинания (обладает накопительным эффектом)"
+                                onclick="allattackclick('silence')">Безмолвие (P)</button>
+                            <button title="230 магии каждый ход -1 атаки противнику"
+                                onclick="allattackclick('plaque')">Чума</button>
+                        </div>
+
+                        <div>
+                            <button title="50 магии +10 атака -5 защита" onclick="allattackclick('berserk')">Берсерк
+                                (4)</button>
+                            <button title="должно быть 100 магии -80% здоровья, 40% уходят в магию"
+                                onclick="allattackclick('devastation')">Разорение (5)</button>
+                            <button title="должно быть 100 магии -30 лечение +20 магии"
+                                onclick="allattackclick('sacrifice')">Жертвоприношение (6)</button>
+                            <button title="120 магии защита обнуляется и у вас и у противника"
+                                onclick="allattackclick('slaughterhouse')">Бойня (7)</button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="your-port">
+                    <img src="" alt="" class="blue-port" id="blue1">
+                </div>
+                <div class="stat">
+                    <div class="your-stat"></div>
+                    <div class="en-stat"></div>
+                </div>
+                <div class="enemy-port"><img src="" alt="" class="red-port"> </div>
+            </div>
+            <div class="display-move">
+                <ul>
+                    <li class="player_move"></li>
+                    <li class="enemy_move"></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="second-zone"></div>
+
+    </body>
+
+</html>
